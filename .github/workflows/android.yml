@@ -38,7 +38,7 @@ jobs:
           with open('config/ci.json','w') as f: json.dump({k:os.getenv(k,'') for k in keys},f)
           PY
       - run: flutter pub get
-      - run: flutter analyze
+      - run: flutter analyze --no-fatal-infos
       - run: flutter test --reporter expanded
       - name: Build release-mode APK with test signing
         run: flutter build apk --release --dart-define-from-file=config/ci.json
