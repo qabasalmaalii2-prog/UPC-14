@@ -1,4 +1,6 @@
 -- Apply to a fresh Supabase project. Never ship the service-role key in a client.
+-- UPC-14 existing Supabase project was migrated safely via staged migrations.
+-- Do not reapply this baseline directly to that already initialized project.
 create extension if not exists btree_gist with schema extensions;
 create extension if not exists pgcrypto with schema extensions;
 create table public.accounts (
@@ -45,7 +47,7 @@ create table public.purchases(id uuid primary key default gen_random_uuid(),user
 create table public.grants(id uuid primary key default gen_random_uuid(),user_id uuid not null references public.accounts(id) on delete cascade,actor_id uuid not null,plan text not null,created_at timestamptz not null default now());
 
 create function public.new_account() returns trigger language plpgsql security definer set search_path=public,pg_temp as $$
-begin insert into public.accounts(id) values(new.id);return new;end $$;
+begin insert into public.accounts(id) values(new.id);return new;end; $$;
 create trigger upc_new_account after insert on auth.users for each row execute function public.new_account();
 -- If deploying after users were created, preserve the original signup trial start.
 insert into public.accounts(id,created_at,trial_ends_at)
@@ -85,17 +87,17 @@ alter table public.audit_log enable row level security;
 alter table public.purchases enable row level security;
 alter table public.grants enable row level security;
 
-create function public.prevent_archive_update() returns trigger language plpgsql as $$
-begin raise exception 'Archive snapshots are immutable. Use Duplicate.';end $$;
+create function public.prevent_archive_update() returns trigger language plpgsql set search_path=public,pg_temp as $
+begin raise exception 'Archive snapshots are immutable. Use Duplicate.';end; $$;
 create trigger immutable_archive before update on public.archive for each row execute function public.prevent_archive_update();
-create function public.validate_rates() returns trigger language plpgsql as $$
+create function public.validate_rates() returns trigger language plpgsql set search_path=public,pg_temp as $
 declare k text;v jsonb;
 begin
  for k,v in select key,value from jsonb_each(new.rates) loop
   if k !~ '^(GROUP|DBL|TRPL|QUAD)/(roomOnly|bb|hb|fb)$' or jsonb_typeof(v)<>'number' or v::text !~ '^\d+$' or (v::text)::numeric>1000000000000 then raise exception 'Invalid rate key or nonnegative minor-unit amount';end if;
  end loop;
  return new;
-end $$;
+end; $$;
 create trigger check_period_rates before insert or update on public.price_periods for each row execute function public.validate_rates();
 
 create function public.put_draft(p_body jsonb,p_expected bigint) returns bigint language plpgsql security definer set search_path=public,pg_temp as $$
@@ -109,7 +111,7 @@ begin
  insert into public.drafts(user_id,body,revision) values(auth.uid(),p_body,1)
  on conflict(user_id) do update set body=p_body,revision=public.drafts.revision+1,updated_at=now() returning revision into rev;
  return rev;
-end $$;
+end; $$;
 
 -- Verify complete per-night math against the supplied frozen inputs. Manual prices
 -- are legitimate; server must not recalculate archives against current hotel rates.
@@ -140,7 +142,7 @@ begin
      line_count:=line_count+1;price:=(n->>'price')::bigint;plan:=n->>'plan';
      if price is null or plan is null or n->>'date' is null or n->>'type' is null or n->>'quantity' is null or n->>'total' is null then raise exception 'Incomplete nightly row';end if;
      if price<0 or price>1000000000000 or (n->>'price')!~'^\d+$' or plan not in ('roomOnly','bb','hb','fb') or (n->>'quantity')::bigint<>q or (n->>'date')::date<in_date or (n->>'date')::date>=out_date then raise exception 'Invalid nightly price';end if;
-     if n->>'type'<>case when mode='group' then 'GROUP' else upper(l->>'type') end then raise exception 'Invalid nightly room type';end if;
+     if (n->>'type') <> (case when mode='group' then 'GROUP' else upper(l->>'type') end) then raise exception 'Invalid nightly room type';end if;
      if (select count(*) from jsonb_array_elements(cr->'nights') x where x->>'lineId'=l->>'id' and x->>'date'=n->>'date')<>1 then raise exception 'Duplicate nightly row';end if;
      if l->'overrides' ? (n->>'date') then
       if price<>((l->'overrides'->(n->>'date'))->>'price')::bigint or plan<>((l->'overrides'->(n->>'date'))->>'plan') then raise exception 'Override mismatch';end if;
@@ -167,7 +169,7 @@ begin
   f:=(d->>'fx')::numeric;
   if f<=0 or f>100000 or f::text in ('NaN','Infinity','-Infinity') or f<>(r->>'fx')::numeric or abs(round((grand+st)::numeric/100/f,2)-(r->>'usd')::numeric)>0.01 then raise exception 'Invalid FX conversion';end if;
  elsif r->>'fx' is not null or r->>'usd' is not null then raise exception 'FX unavailable';end if;
-end $$;
+end; $$;
 
 create function public.consume_usage(p_id uuid,p_mode text) returns void language plpgsql security definer set search_path=public,pg_temp as $$
 declare a public.accounts; existing public.usage_ledger;premium boolean;
@@ -179,7 +181,7 @@ begin
  premium:=a.permanent or a.premium_until>now() or a.trial_ends_at>now();premium:=coalesce(premium,false);
  if not premium and exists(select 1 from public.usage_ledger where user_id=auth.uid() and mode=p_mode and charged_free) then raise exception 'PREMIUM_REQUIRED';end if;
  insert into public.usage_ledger(user_id,calculation_id,mode,charged_free) values(auth.uid(),p_id,p_mode,not premium);
-end $$;
+end; $$;
 create function public.submit_calculation(p_snapshot jsonb,p_action text) returns boolean language plpgsql security definer set search_path=public,pg_temp as $$
 declare cid uuid; existing public.archive;
 begin
@@ -194,23 +196,23 @@ begin
   else insert into public.archive(id,user_id,snapshot) values(cid,auth.uid(),p_snapshot);end if;
  end if;
  return true;
-end $$;
+end; $$;
 create function public.authorize_share(p_snapshot jsonb,p_text boolean) returns boolean language plpgsql security definer set search_path=public,pg_temp as $$
 begin
  if p_text and not public.is_role(array['OWNER']) then raise exception 'OWNER_ONLY';end if;
  perform public.submit_calculation(p_snapshot,'share');return true;
-end $$;
+end; $$;
 
 create function public.admin_overview() returns jsonb language plpgsql security definer set search_path=public,pg_temp as $$
 begin
  if not public.is_role(array['OWNER','ADMIN','SUPPORT','ANALYST']) then raise exception 'ADMIN_REQUIRED';end if;
  return jsonb_build_object('total_users',(select count(*) from public.accounts),'active_accounts',(select count(*) from public.accounts where status='active'),'trial_users',(select count(*) from public.accounts where trial_ends_at>now()),'premium_users',(select count(*) from public.accounts where permanent or premium_until>now()),'group_usage',(select count(*) from public.usage_ledger where mode='group'),'individual_usage',(select count(*) from public.usage_ledger where mode='individual'),'premium_grants',(select count(*) from public.grants),'blocked_accounts',(select count(*) from public.accounts where status='blocked'));
-end $$;
+end; $$;
 create function public.admin_users(p_query text default '',p_limit int default 100) returns jsonb language plpgsql security definer set search_path=public,pg_temp as $$
 begin
  if not public.is_role(array['OWNER','ADMIN','SUPPORT']) then raise exception 'OPERATIONS_REQUIRED';end if;
  return coalesce((select jsonb_agg(row_to_json(t)) from (select a.id,u.email,u.raw_user_meta_data->>'full_name' as full_name,a.role,a.status,a.trial_ends_at,a.premium_until,a.permanent,a.created_at from public.accounts a join auth.users u on u.id=a.id where coalesce(u.email,'') ilike '%'||p_query||'%' or coalesce(u.raw_user_meta_data->>'full_name','') ilike '%'||p_query||'%' order by a.created_at desc limit least(greatest(p_limit,1),100)) t),'[]'::jsonb);
-end $$;
+end; $$;
 create function public.admin_set_status(p_user uuid,p_status text) returns void language plpgsql security definer set search_path=public,pg_temp as $$
 begin
  if not public.is_role(array['OWNER','ADMIN']) then raise exception 'OPERATIONS_REQUIRED';end if;
@@ -218,7 +220,7 @@ begin
  if p_status not in ('active','suspended','blocked') then raise exception 'Invalid status';end if;
  update public.accounts set status=p_status where id=p_user;
  insert into public.audit_log(actor_id,subject_id,action,detail) values(auth.uid(),p_user,'account_status',jsonb_build_object('status',p_status));
-end $$;
+end; $$;
 create function public.owner_grant(p_user uuid,p_plan text) returns void language plpgsql security definer set search_path=public,pg_temp as $$
 begin
  if not public.is_role(array['OWNER']) then raise exception 'OWNER_ONLY';end if;
@@ -226,25 +228,42 @@ begin
  update public.accounts set permanent=(p_plan='unlimited'),premium_until=case p_plan when '1m' then now()+interval '30 days' when '6m' then now()+interval '6 months' when '1y' then now()+interval '1 year' else null end where id=p_user;
  insert into public.grants(user_id,actor_id,plan) values(p_user,auth.uid(),p_plan);
  insert into public.audit_log(actor_id,subject_id,action,detail) values(auth.uid(),p_user,'premium_grant',jsonb_build_object('plan',p_plan));
-end $$;
+end; $$;
 create function public.owner_configure(p_body jsonb) returns void language plpgsql security definer set search_path=public,pg_temp as $$
 begin
  if not public.is_role(array['OWNER']) then raise exception 'OWNER_ONLY';end if;
  update public.app_settings set body=p_body where id=1;
  insert into public.audit_log(actor_id,action,detail) values(auth.uid(),'app_configuration',p_body);
-end $$;
+end; $$;
 create function public.admin_audit() returns jsonb language plpgsql security definer set search_path=public,pg_temp as $$
 begin
  if not public.is_role(array['OWNER','ADMIN','ANALYST']) then raise exception 'ADMIN_REQUIRED';end if;
  return coalesce((select jsonb_agg(row_to_json(t)) from(select * from public.audit_log order by created_at desc limit 200)t),'[]'::jsonb);
-end $$;
+end; $$;
 create function public.admin_feedback() returns jsonb language plpgsql security definer set search_path=public,pg_temp as $$
 begin
  if not public.is_role(array['OWNER','ADMIN','SUPPORT']) then raise exception 'SUPPORT_REQUIRED';end if;
  return coalesce((select jsonb_agg(row_to_json(t)) from(select * from public.feedback order by created_at desc limit 200)t),'[]'::jsonb);
-end $$;
+end; $$;
 -- Revoke default PUBLIC execution, especially internal privilege functions.
-revoke all on all functions in schema public from public,anon,authenticated;
+-- Limit revokes to UPC's own functions; never change existing project functions.
+revoke all on function public.new_account(),
+  public.active_user(),
+  public.is_role(text[]),
+  public.prevent_archive_update(),
+  public.validate_rates(),
+  public.put_draft(jsonb,bigint),
+  public.validate_snapshot(jsonb),
+  public.consume_usage(uuid,text),
+  public.submit_calculation(jsonb,text),
+  public.authorize_share(jsonb,boolean),
+  public.admin_overview(),
+  public.admin_users(text,int),
+  public.admin_set_status(uuid,text),
+  public.owner_grant(uuid,text),
+  public.owner_configure(jsonb),
+  public.admin_audit(),
+  public.admin_feedback() from public,anon,authenticated;
 grant execute on function public.active_user(),public.is_role(text[]),public.put_draft(jsonb,bigint),public.submit_calculation(jsonb,text),public.authorize_share(jsonb,boolean),public.admin_overview(),public.admin_users(text,int),public.admin_set_status(uuid,text),public.owner_grant(uuid,text),public.owner_configure(jsonb),public.admin_audit(),public.admin_feedback() to authenticated;
 grant usage on schema public to authenticated;
 grant select on public.accounts,public.drafts,public.archive,public.usage_ledger,public.devices,public.app_settings to authenticated;
