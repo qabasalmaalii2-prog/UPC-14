@@ -1,0 +1,38 @@
+import 'package:flutter/material.dart';
+import '../data/store.dart';
+import '../domain/calculator.dart';
+import '../l10n/strings.dart';
+import 'shell.dart';
+import 'theme.dart';
+class HotelsScreen extends StatefulWidget {
+  final UpcStore store;
+  const HotelsScreen(this.store,{super.key});
+  @override State<HotelsScreen> createState()=>_HotelsScreenState();
+}
+class _HotelsScreenState extends State<HotelsScreen> {
+  String city='madinah',query='';
+  @override Widget build(BuildContext context){final s=Strings.of(context);return ListView(padding:const EdgeInsets.all(10),children:[Panel(child:Column(children:[Row(children:[Expanded(child:TextButton(onPressed:()=>setState(()=>city='madinah'),child:Text(s['madinah'],style:TextStyle(color:city=='madinah'?green:null,fontWeight:FontWeight.bold)))),Expanded(child:TextButton(onPressed:()=>setState(()=>city='makkah'),child:Text(s['makkah'],style:TextStyle(color:city=='makkah'?blue:null,fontWeight:FontWeight.bold))))]),TextField(decoration:InputDecoration(prefixIcon:const Icon(Icons.search),hintText:s['search']),onChanged:(v)=>setState(()=>query=v)),TextButton.icon(onPressed:()=>editHotel(context,widget.store,null,city),icon:const Icon(Icons.add),label:Text(s['newHotel']))])),...widget.store.hotels.where((h)=>h.city==city&&h.name.toLowerCase().contains(query.toLowerCase())).map((h)=>Panel(child:ListTile(contentPadding:EdgeInsets.zero,leading:Container(width:44,height:48,decoration:BoxDecoration(color:(city=='madinah'?green:blue).withValues(alpha:.1),borderRadius:BorderRadius.circular(7)),child:Icon(Icons.apartment,color:city=='madinah'?green:blue)),title:Text(h.name),subtitle:Text('${s[h.city]} · ${h.periods.length} price periods'),trailing:const Icon(Icons.chevron_right),onTap:()=>Navigator.push(context,MaterialPageRoute<void>(builder:(_)=>HotelDetail(widget.store,h.id)))))),if(widget.store.hotels.where((h)=>h.city==city).isEmpty)Text(s['noRecords'])]);}
+}
+Future<void> editHotel(BuildContext context,UpcStore store,Hotel? hotel,String city)async {
+  final controller=TextEditingController(text:hotel?.name??'');String selected=hotel?.city??city;
+  final ok=await showDialog<bool>(context:context,builder:(ctx)=>StatefulBuilder(builder:(ctx,set)=>AlertDialog(title:Text(Strings.of(ctx)['hotel']),content:Column(mainAxisSize:MainAxisSize.min,children:[TextField(controller:controller,decoration:InputDecoration(labelText:Strings.of(ctx)['name'])),DropdownButton<String>(value:selected,isExpanded:true,items:['madinah','makkah'].map((v)=>DropdownMenuItem(value:v,child:Text(Strings.of(ctx)[v]))).toList(),onChanged:(v)=>set(()=>selected=v!))]),actions:[TextButton(onPressed:()=>Navigator.pop(ctx,false),child:Text(Strings.of(ctx)['cancel'])),TextButton(onPressed:()=>Navigator.pop(ctx,true),child:Text(Strings.of(ctx)['save']))])));
+  final name=controller.text.trim();controller.dispose();
+  if(ok==true&&name.isNotEmpty&&context.mounted){await runAction(context,()=>store.putHotel(Hotel(hotel?.id??UpcStore.uuid.v4(),name,selected,hotel?.periods)));}
+}
+class HotelDetail extends StatelessWidget {
+  final UpcStore store;final String hotelId;
+  const HotelDetail(this.store,this.hotelId,{super.key});
+  @override Widget build(BuildContext context)=>ListenableBuilder(listenable:store,builder:(context,_){final match=store.hotels.where((h)=>h.id==hotelId);if(match.isEmpty){return Scaffold(appBar:AppBar(),body:const SizedBox.shrink());}final h=match.first,s=Strings.of(context);return Scaffold(appBar:AppBar(title:Text(h.name),actions:[IconButton(tooltip:s['delete'],icon:const Icon(Icons.delete_outline),onPressed:()=>runAction(context,()async{if(await askConfirm(context,s['deleteConfirm'])){await store.deleteHotel(h);if(context.mounted){Navigator.pop(context);}}}))]),body:ListView(padding:const EdgeInsets.all(10),children:[Panel(child:ListTile(leading:const Icon(Icons.apartment,size:36),title:Text(h.name),subtitle:Text(s[h.city]),trailing:IconButton(icon:const Icon(Icons.edit_outlined),onPressed:()=>editHotel(context,store,h,h.city)))),ElevatedButton.icon(onPressed:()=>Navigator.push(context,MaterialPageRoute<void>(builder:(_)=>PeriodEditor(store,h))),icon:const Icon(Icons.add),label:Text(s['period'])),const SizedBox(height:10),...h.periods.map((p)=>Panel(child:Column(crossAxisAlignment:CrossAxisAlignment.stretch,children:[Row(children:[Expanded(child:Text('${p.from} → ${p.to}',style:const TextStyle(fontWeight:FontWeight.bold))),IconButton(icon:const Icon(Icons.edit_outlined),onPressed:()=>Navigator.push(context,MaterialPageRoute<void>(builder:(_)=>PeriodEditor(store,h,period:p)))),IconButton(icon:const Icon(Icons.delete_outline,color:Colors.red),onPressed:()=>runAction(context,()async{if(await askConfirm(context,s['deleteConfirm'])){await store.deletePeriod(p);}}))]),...p.rates.entries.map((e)=>Padding(padding:const EdgeInsets.symmetric(vertical:3),child:Row(children:[Expanded(child:Text(e.key)),Text('${money(e.value)} SAR')])))]))) ]));});
+}
+class PeriodEditor extends StatefulWidget {
+  final UpcStore store;final Hotel hotel;final Period? period;
+  const PeriodEditor(this.store,this.hotel,{super.key,this.period});
+  @override State<PeriodEditor> createState()=>_PeriodEditorState();
+}
+class _PeriodEditorState extends State<PeriodEditor> {
+  late String from,to;final form=GlobalKey<FormState>();final rates=<String,TextEditingController>{};bool busy=false;
+  @override void initState(){super.initState();from=widget.period?.from??day(DateTime.now());to=widget.period?.to??from;for(final type in ['GROUP','DBL','TRPL','QUAD']){for(final p in RatePlan.values){final key='$type/${p.name}';rates[key]=TextEditingController(text:widget.period?.rates[key]==null?'':money(widget.period!.rates[key]!));}}}
+  @override void dispose(){for(final c in rates.values){c.dispose();}super.dispose();}
+  Future<void> date(bool start)async{final v=await showDatePicker(context:context,initialDate:parseDay(start?from:to),firstDate:DateTime(2020),lastDate:DateTime(2100));if(v!=null){setState((){if(start){from=day(v);}else{to=day(v);}});}}
+  @override Widget build(BuildContext context){final s=Strings.of(context);return Scaffold(appBar:AppBar(title:Text(s['period'])),body:Form(key:form,child:ListView(padding:const EdgeInsets.all(12),children:[Row(children:[Expanded(child:OutlinedButton(onPressed:()=>date(true),child:Text('${s['from']} $from'))),const SizedBox(width:8),Expanded(child:OutlinedButton(onPressed:()=>date(false),child:Text('${s['to']} $to')))]),const Text('FROM and TO are inclusive. Blank price = unavailable, not zero.',style:TextStyle(fontSize:12)),const SizedBox(height:10),...['GROUP','DBL','TRPL','QUAD'].map((type)=>Panel(child:Column(crossAxisAlignment:CrossAxisAlignment.start,children:[Text(type,style:const TextStyle(fontWeight:FontWeight.bold)),const SizedBox(height:8),...RatePlan.values.map((p)=>Padding(padding:const EdgeInsets.only(bottom:8),child:TextFormField(controller:rates['$type/${p.name}'],keyboardType:const TextInputType.numberWithOptions(decimal:true),decoration:InputDecoration(labelText:'${planLabel(p)} · SAR / room / night'),validator:(v){if(v==null||v.isEmpty){return null;}try{cents(v);return null;}catch(_){return 'Invalid amount';}})))]))),ElevatedButton(onPressed:busy?null:()=>runAction(context,()async{if(!form.currentState!.validate()){return;}final map=<String,int>{};for(final e in rates.entries){if(e.value.text.isNotEmpty){map[e.key]=cents(e.value.text);}}final period=Period(widget.period?.id??UpcStore.uuid.v4(),from,to,map);setState(()=>busy=true);try{await widget.store.putPeriod(widget.hotel,period);if(context.mounted){Navigator.pop(context);}}finally{if(mounted){setState(()=>busy=false);}}}),child:Text(busy?'…':s['save']))])));}
+}

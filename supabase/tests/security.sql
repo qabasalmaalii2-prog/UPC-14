@@ -1,0 +1,22 @@
+-- Run with: supabase test db (pgTAP). Local test database only; rollback at end.
+begin;
+create extension if not exists pgtap with schema extensions;
+select plan(8);
+insert into auth.users(id,email,created_at) values('aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa','test-a@example.invalid',now()-interval '30 days'),('bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb','test-b@example.invalid',now()-interval '30 days');
+update public.accounts set trial_ends_at=now()-interval '1 day' where id in ('aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa','bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb');
+insert into public.hotels(id,user_id,name,city) values('cccccccc-cccc-4ccc-cccc-cccccccccccc','aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa','Private A','madinah');
+set local role authenticated;
+select set_config('request.jwt.claim.sub','aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',true);
+select is((select count(*)::int from public.hotels),1,'User A sees own hotel');
+select throws_ok($$update public.accounts set permanent=true where id=auth.uid()$$,'42501',null,'Client cannot grant Premium');
+select set_config('request.jwt.claim.sub','bbbbbbbb-bbbb-4bbb-bbbb-bbbbbbbbbbbb',true);
+select is((select count(*)::int from public.hotels),0,'User B cannot see User A hotel');
+select throws_ok($$select public.owner_grant(auth.uid(),'unlimited')$$,'P0001','OWNER_ONLY','User cannot grant Premium');
+select throws_ok($$select public.admin_users('',100)$$,'P0001','OPERATIONS_REQUIRED','User cannot read admin users');
+select set_config('request.jwt.claim.sub','aaaaaaaa-aaaa-4aaa-aaaa-aaaaaaaaaaaa',true);
+reset role;
+select lives_ok($$select public.consume_usage('dddddddd-dddd-4ddd-dddd-dddddddddddd','group')$$,'First free group usage accepted');
+select lives_ok($$select public.consume_usage('dddddddd-dddd-4ddd-dddd-dddddddddddd','group')$$,'Repeated usage is idempotent');
+select throws_ok($$select public.consume_usage('eeeeeeee-eeee-4eee-eeee-eeeeeeeeeeee','group')$$,'P0001','PREMIUM_REQUIRED','Second new free group usage denied');
+select * from finish();
+rollback;

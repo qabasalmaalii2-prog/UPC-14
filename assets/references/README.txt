@@ -1,0 +1,1 @@
+Eight approved reference images extracted from the supplied PDF. These boards contain obsolete mock features; the written specification overrides those labels. Do not use boards as live screen screenshots.

@@ -1,0 +1,15 @@
+project_id = "upc"
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+[db]
+port = 54322
+major_version = 15
+[auth]
+enabled = true
+site_url = "http://localhost:3000"
+additional_redirect_urls = ["com.upc.calculator://login-callback/"]
+[functions.delete-account]
+verify_jwt = true

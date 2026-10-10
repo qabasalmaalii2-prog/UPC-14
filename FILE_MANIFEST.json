@@ -1,0 +1,307 @@
+[
+  {
+    "path": ".github/workflows/android.yml",
+    "bytes": 1913,
+    "sha256": "7c176b6a5996ac51a9dd5fb66c4b702c559da5d6257e78b28c361928816e3b91"
+  },
+  {
+    "path": ".github/workflows/backend.yml",
+    "bytes": 571,
+    "sha256": "5b2903dd03aee642b874e9ebae13f27a523dc86082e9fa2f585870f961cdd8e6"
+  },
+  {
+    "path": ".gitignore",
+    "bytes": 194,
+    "sha256": "e9adb3cd1ce3309c718079a3e00e685f1326caf360061f4366282ec32122b833"
+  },
+  {
+    "path": "DELIVERY_STATUS.md",
+    "bytes": 5902,
+    "sha256": "0925641a1df30bfac894c446e8e9da4b4d4e00be30b7cc9d8ed7260cb5d66184"
+  },
+  {
+    "path": "FILE_MANIFEST.json",
+    "bytes": 9066,
+    "sha256": "332276e507c4ed3b9cc9f481619784ff483210b2fff6e0b68e7bde066869eeb1"
+  },
+  {
+    "path": "README.md",
+    "bytes": 2076,
+    "sha256": "584dd1dec30c5e2eb628816cc933f8e0b153e301a8202bac0b96e95751f7dbd9"
+  },
+  {
+    "path": "analysis_options.yaml",
+    "bytes": 248,
+    "sha256": "79ac9ce250cbbdac5a731148e40ef79246d00f20f4daea96ea215bb73e376e87"
+  },
+  {
+    "path": "android/app/build.gradle.kts",
+    "bytes": 901,
+    "sha256": "75c816843cbeab4298b519e33e4b06d36b0f69ab58e47ab5c483ca51e564a8d8"
+  },
+  {
+    "path": "android/app/src/main/AndroidManifest.xml",
+    "bytes": 1724,
+    "sha256": "3ead5ac23968709ff8f138686504eecfc7e3c893b570762868317bc5793fc2b8"
+  },
+  {
+    "path": "android/app/src/main/kotlin/com/upc/calculator/MainActivity.kt",
+    "bytes": 117,
+    "sha256": "0d84ea363a1fdd9b7c522234513cdba260f20fd66876697bfe995e9c912ed3cb"
+  },
+  {
+    "path": "android/app/src/main/res/drawable/launch_background.xml",
+    "bytes": 171,
+    "sha256": "bdb3bb3db2f76a8835ca410a9060fed9ca3849df4ac88c841e3fae1de4623d5c"
+  },
+  {
+    "path": "android/app/src/main/res/mipmap-hdpi/ic_launcher.png",
+    "bytes": 1108,
+    "sha256": "fc0d4295b0021c71d28578f7a443b9be774dafc084803456debbbcb00b8975ad"
+  },
+  {
+    "path": "android/app/src/main/res/mipmap-mdpi/ic_launcher.png",
+    "bytes": 667,
+    "sha256": "c7a1742f2ef59866a27e6e85f1ba3cada38081b56ebd3a938ca39f44eaf76db4"
+  },
+  {
+    "path": "android/app/src/main/res/mipmap-xhdpi/ic_launcher.png",
+    "bytes": 1615,
+    "sha256": "7a4486c2261b0ae966b2261da57b4b394780bf2697e4f0dad47aa53d7c9db312"
+  },
+  {
+    "path": "android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png",
+    "bytes": 2511,
+    "sha256": "68aa2b6182ac3917f6e51aa0944f2f30cd9f60f56dfb76d9897c01d51067ccae"
+  },
+  {
+    "path": "android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png",
+    "bytes": 3415,
+    "sha256": "da8b9f1f2464693fc50d38210c6d96508376a6fc548b6150e9a5c78406bd175a"
+  },
+  {
+    "path": "android/app/src/main/res/values/styles.xml",
+    "bytes": 342,
+    "sha256": "3e3e5805556ab7723ea16d34b55443af797bb714c84c4f92d2f3af77f3f505da"
+  },
+  {
+    "path": "android/build.gradle.kts",
+    "bytes": 377,
+    "sha256": "0306b8afa2ef2f037d632eafa52466946f18de17428a932b4b39420c239f76b0"
+  },
+  {
+    "path": "android/gradle/wrapper/gradle-wrapper.properties",
+    "bytes": 203,
+    "sha256": "b00bce270ab40aa29758d7fe51c356a1bf8dc9a9a0d15e2a5d9a8a6609a749be"
+  },
+  {
+    "path": "android/gradle.properties",
+    "bytes": 135,
+    "sha256": "19850466a740b73e564be7c62a4b382c2ca8cc94f1057cf510315a0eb74c91a5"
+  },
+  {
+    "path": "android/gradlew",
+    "bytes": 495,
+    "sha256": "e8e4779695d077a4154469f99cb90ef48913ad76495b72e2d002ccbd3425c8a4"
+  },
+  {
+    "path": "android/gradlew.bat",
+    "bytes": 349,
+    "sha256": "b9df681e543969e8070ccda265310a869beb26a75363aab79b51b06bc515b91e"
+  },
+  {
+    "path": "android/settings.gradle.kts",
+    "bytes": 683,
+    "sha256": "ab087b594b8168caef0632e8d5ee03846b552474a2c1ac24b8197ec925d8c2d0"
+  },
+  {
+    "path": "assets/references/README.txt",
+    "bytes": 206,
+    "sha256": "f0d7f4434ac8dfb1f8b745e97bb9351dff676e9eb95a1a66ac02380fc938ff31"
+  },
+  {
+    "path": "assets/references/reference-000.jpg",
+    "bytes": 325032,
+    "sha256": "df0cede34fbf319f6ef549627f1e6962c372289f8055064da916e6f2b3e2d93e"
+  },
+  {
+    "path": "assets/references/reference-001.jpg",
+    "bytes": 307497,
+    "sha256": "36bc050b8a6502f27facc8f21996c824632e9137f0ab2e0c079f372dac6dbbfa"
+  },
+  {
+    "path": "assets/references/reference-002.jpg",
+    "bytes": 305343,
+    "sha256": "d215aea9e4b06ae143d5413538973eebc9c9625a085ae5ffffb5519ec96e0095"
+  },
+  {
+    "path": "assets/references/reference-003.jpg",
+    "bytes": 281877,
+    "sha256": "39fc092c9a334b34f5b8ee77089f98b3076b9eff2f3012bc31a066f485024861"
+  },
+  {
+    "path": "assets/references/reference-004.jpg",
+    "bytes": 343254,
+    "sha256": "fbfd6122cdfd00bee11714856a0198ae5d277d45179a4870b7f89347be95c92b"
+  },
+  {
+    "path": "assets/references/reference-005.jpg",
+    "bytes": 263035,
+    "sha256": "81c1b6134ffb33c4ea0207331b9f36e7e8e37c6a31f33657ccfa276f2a86b378"
+  },
+  {
+    "path": "assets/references/reference-006.jpg",
+    "bytes": 257091,
+    "sha256": "ba932e065bfd2586624931fc79c3292468abb12674b6e5212434993358c1db6d"
+  },
+  {
+    "path": "assets/references/reference-007.jpg",
+    "bytes": 256214,
+    "sha256": "56db7254b86ba9a0918576468284e59e157ad5d1d8a38ba46a2a9468f48df67a"
+  },
+  {
+    "path": "config/app.example.json",
+    "bytes": 122,
+    "sha256": "a887eb72888d8af16f40aa82fbad1da02b64123666b74bd226ed630a3b17cdc7"
+  },
+  {
+    "path": "docs/ACCEPTANCE.md",
+    "bytes": 1630,
+    "sha256": "90b951f56cf22a1e086e1070f24c2a42e3d66100c65936b544e423397872f5bc"
+  },
+  {
+    "path": "docs/SETUP.md",
+    "bytes": 4760,
+    "sha256": "e1206946b3eac24f5698408bea3bf9d9d47a40eed370f93e3efbeb2967b398a2"
+  },
+  {
+    "path": "docs/UPC_Master_Specification.pdf",
+    "bytes": 2988461,
+    "sha256": "d3b29651357d10630c06880f4d9e3994c387914a0a40c2b47257363daf56e7ea"
+  },
+  {
+    "path": "docs/VERIFICATION.md",
+    "bytes": 1131,
+    "sha256": "055b961df18e9f30b245d84eedec813dc203eb51ced34570500248beadd914f5"
+  },
+  {
+    "path": "lib/admin_main.dart",
+    "bytes": 8430,
+    "sha256": "f1e3dd3842bdc527cbba9ebda42c901785fd377afad1f849f2bbbc06337de7d0"
+  },
+  {
+    "path": "lib/config.dart",
+    "bytes": 519,
+    "sha256": "ccd26bd0e63dcba2fd2fab5fa7f1e8b84aecbd4cb252a19c267676f9188135b0"
+  },
+  {
+    "path": "lib/data/store.dart",
+    "bytes": 8712,
+    "sha256": "9a956ddaaae0b4143cdcc1adec9c3aaa3ed1ccd54c68700a39d1a507753fed03"
+  },
+  {
+    "path": "lib/domain/calculator.dart",
+    "bytes": 10943,
+    "sha256": "a40e4b43f21cc734c2544c0657115889a37d9bc6fbf82af110d558db50f3a0d8"
+  },
+  {
+    "path": "lib/l10n/strings.dart",
+    "bytes": 7096,
+    "sha256": "279ecaaf372b0a345226a54fc006963e231fd4910a3e81f680a0a94a26e16c92"
+  },
+  {
+    "path": "lib/main.dart",
+    "bytes": 2762,
+    "sha256": "6a77f6d3ca526030708ce33cab4455dd73d28792c08e83c1fd84ebca45085944"
+  },
+  {
+    "path": "lib/ui/archive.dart",
+    "bytes": 4077,
+    "sha256": "0b34e57dea5ff593f2195ae625c49310ac632a44109d8b69d7429cbe7c033712"
+  },
+  {
+    "path": "lib/ui/auth.dart",
+    "bytes": 3406,
+    "sha256": "0ed182fd17880efc7bb4ecb15df2735d26cdd79e6278b932a5f731d05eec88ee"
+  },
+  {
+    "path": "lib/ui/calculator_screen.dart",
+    "bytes": 15007,
+    "sha256": "86473b50acaa60971394c7cb7cbccc1f5b2f7454d5d35b2dc2b0b4915ab06a32"
+  },
+  {
+    "path": "lib/ui/hotels.dart",
+    "bytes": 7697,
+    "sha256": "73a0bfae8ba4ef75acf7a0fe2baaa02b6c357f931535cf18ab794f217623f0aa"
+  },
+  {
+    "path": "lib/ui/settings.dart",
+    "bytes": 9620,
+    "sha256": "fdf8091729cb63ac194918eaddd4fb1b729f983ba89eed598aabb2b4a7c78197"
+  },
+  {
+    "path": "lib/ui/sharing.dart",
+    "bytes": 7846,
+    "sha256": "3757924ad78e2fca054a3049ed9972fa51d025dd2ec65c0d5b959d4c9b551a1b"
+  },
+  {
+    "path": "lib/ui/shell.dart",
+    "bytes": 3103,
+    "sha256": "bc8633257870f3737349f22a49ca25b854bc9ab7cc879dec8c7c025e64d00f54"
+  },
+  {
+    "path": "lib/ui/theme.dart",
+    "bytes": 2555,
+    "sha256": "3ebb9afc7cca204cb8274ea746794fad7575edd839d98ef8485d638ed6940369"
+  },
+  {
+    "path": "pubspec.yaml",
+    "bytes": 553,
+    "sha256": "f2b2a15cf137487d57e2d14e50fa790a3c25833de368c12eecd10cb9ff152485"
+  },
+  {
+    "path": "scripts/bootstrap_android.ps1",
+    "bytes": 567,
+    "sha256": "628d739c7c1faf98cf6cc05b82e161fb567510761836d372b2b0b10f418d85d5"
+  },
+  {
+    "path": "scripts/bootstrap_android.sh",
+    "bytes": 699,
+    "sha256": "c4431d7eeb973b9579f6ec842f530055cd45acd6df3bd58a4f7711b1599ea6b5"
+  },
+  {
+    "path": "supabase/config.toml",
+    "bytes": 344,
+    "sha256": "8c51bf412491767a0cc9037000298ed56c6292acb4f2e1f012ce689fec10829e"
+  },
+  {
+    "path": "supabase/functions/delete-account/index.ts",
+    "bytes": 1165,
+    "sha256": "9eced46d556e3403756a9597ec00e3e59e83b89f1e1cb67c987d0d2b80d31d87"
+  },
+  {
+    "path": "supabase/migrations/202610100001_upc.sql",
+    "bytes": 21527,
+    "sha256": "39e20395459449688b95ca92d28153e411196dac81e5075b726251f2d27410c4"
+  },
+  {
+    "path": "supabase/tests/security.sql",
+    "bytes": 2014,
+    "sha256": "f138c906394dd018e101ed58a7392860923432a637c27948be9f27c4c95aca44"
+  },
+  {
+    "path": "test/calculator_test.dart",
+    "bytes": 5459,
+    "sha256": "98a55b7d495cc07f43effe935162a4a5b6ddd15f92a974cc30c25007039db131"
+  },
+  {
+    "path": "test/layout_test.dart",
+    "bytes": 1619,
+    "sha256": "1f4b691c71c77a21f58a8b7be3cfa251df2383b8034bc300dc8e785105c709a4"
+  },
+  {
+    "path": "web/index.html",
+    "bytes": 325,
+    "sha256": "ba5e12c30949dd3bbebffc08f83302115e01488950a62d270cd462365f5de8bc"
+  }
+]
