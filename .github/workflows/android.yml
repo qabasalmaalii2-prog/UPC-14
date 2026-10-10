@@ -26,8 +26,8 @@ jobs:
         run: bash scripts/bootstrap_android.sh
       - name: Configure public client values (never service-role secrets)
         env:
-          SUPABASE_URL: ${{ vars.SUPABASE_URL }}
-          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY }}
+          SUPABASE_URL: ${{ vars.SUPABASE_URL || 'https://lpxdtokwvhxtfzzzdlzv.supabase.co' }}
+          SUPABASE_ANON_KEY: ${{ vars.SUPABASE_ANON_KEY || 'sb_publishable_pb2cf5LI_P52l0Ur-dwDIQ_I6s16pY8' }}
           UPC_PUBLIC_URL: ${{ vars.UPC_PUBLIC_URL }}
           SUPPORT_EMAIL: ${{ vars.SUPPORT_EMAIL }}
           SUPPORT_PHONE: ${{ vars.SUPPORT_PHONE }}
